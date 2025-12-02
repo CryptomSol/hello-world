@@ -4,7 +4,7 @@ Polymarket Trading Bot(Polymarket Copytrading & Polymarket Arbitrage bot) with f
 
 ## Contact
 
-If you have any question or need help, contact here: [Telegram](https://t.me/simon1139) | [Twitter](https://x.com/simon_1139)
+If you have any question or need help, contact here: [Telegram](https://t.me/tomharvey1128) | [Twitter](https://x.com/TomHarvey1128)
 
 ## Features
 

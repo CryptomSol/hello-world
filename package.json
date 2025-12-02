@@ -22,7 +22,7 @@
     "bot",
     "typescript"
   ],
-  "author": "",
+  "author": "Tom Harvey",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {

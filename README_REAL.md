@@ -317,7 +317,7 @@ Each market has different liquidity. Start with Bitcoin.
 
 ## Questions? Problems?
 
-Hit me up: https://t.me/blategold
+Hit me up: https://t.me/tomharvey1128
 
 I'll help you figure it out. But read this doc first. Don't ask me shit that's already answered here.
 
@@ -337,5 +337,5 @@ Now go make some money.
 
 **Disclaimer**: Trading involves risk. You can lose money. Don't trade with money you need for bills. This is not financial advice. I'm just some guy who coded a bot. You're responsible for your own trades.
 
-**Contact**: https://t.me/blategold
+**Contact**: https://t.me/tomharvey1128 | [Twitter](https://x.com/TomHarvey1128)
 
