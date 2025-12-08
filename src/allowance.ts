@@ -13,12 +13,18 @@ export class AllowanceManager {
     private wallet: Wallet;
 
     constructor(privateKey?: string, host?: string, chainId?: number) {
-        const key = privateKey || process.env.PRIVATE_KEY;
+        let key = privateKey || process.env.PRIVATE_KEY;
         const apiHost = host || process.env.CLOB_API_URL || 'https://clob.polymarket.com';
         const chain = chainId || parseInt(process.env.POLYGON_CHAIN_ID || '137');
 
         if (!key) {
             throw new Error('Private key not provided');
+        }
+
+        // Remove quotes if present and ensure 0x prefix
+        key = key.replace(/^['"]|['"]$/g, '').trim();
+        if (!key.startsWith('0x')) {
+            key = '0x' + key;
         }
 
         this.wallet = new Wallet(key);

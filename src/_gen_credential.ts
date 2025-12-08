@@ -12,10 +12,16 @@ export class CredentialGenerator {
     private chainId: number;
 
     constructor(privateKey?: string, chainId: number = 137) {
-        const key = privateKey || process.env.PRIVATE_KEY;
+        let key = privateKey || process.env.PRIVATE_KEY;
         
         if (!key) {
             throw new Error('Private key not provided');
+        }
+
+        // Remove quotes if present and ensure 0x prefix
+        key = key.replace(/^['"]|['"]$/g, '').trim();
+        if (!key.startsWith('0x')) {
+            key = '0x' + key;
         }
 
         this.wallet = new ethers.Wallet(key);

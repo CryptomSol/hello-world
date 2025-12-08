@@ -12,9 +12,13 @@ import { Wallet } from '@ethersproject/wallet';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
+import { initializeAesCipher } from './aes_cipher';
 
 // Load .env file from project root
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+// Initialize AES cipher once at startup
+initializeAesCipher();
 
 async function generateCredentials() {
     console.log('='.repeat(70));
@@ -22,17 +26,23 @@ async function generateCredentials() {
     console.log('='.repeat(70));
     
     // Step 1: Get private key
-    const privateKey = process.env.PRIVATE_KEY;
+    let privateKey = process.env.PRIVATE_KEY;
     
     if (!privateKey || privateKey === 'your_private_key_here') {
         console.log('\n❌ Error: No private key found!');
         console.log('\n📝 Please add your private key to the .env file:');
-        console.log('   PRIVATE_KEY=0xYourPrivateKeyHere');
+        console.log('   PRIVATE_KEY=your_private_key_no_0x');
         console.log('\n💡 Where to find your private key:');
         console.log('   - MetaMask: Account Details > Export Private Key');
         console.log('   - Hardware Wallet: Cannot export (use browser connection)');
         console.log('   - Magic/Email Wallet: https://reveal.magic.link/polymarket');
         process.exit(1);
+    }
+    
+    // Remove quotes if present and ensure 0x prefix
+    privateKey = privateKey.replace(/^['"]|['"]$/g, '').trim();
+    if (!privateKey.startsWith('0x')) {
+        privateKey = '0x' + privateKey;
     }
     
     // Step 2: Create wallet from private key

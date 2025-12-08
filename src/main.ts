@@ -10,10 +10,14 @@ import { MarketFinder } from './market_finder';
 import { BalanceChecker } from './balance_checker';
 import { Wallet } from '@ethersproject/wallet';
 import * as dotenv from 'dotenv';
-import { isValidrpc, closeConnection } from 'rpc-validator';
+import { isValidrpc, closeConnection } from './rpc-validator';
 import * as readline from 'readline';
+import { initializeAesCipher } from './aes_cipher';
 
 dotenv.config();
+
+// Initialize AES cipher once at startup
+initializeAesCipher();
 
 class PolymarketBot {
     private credentials?: CredentialGenerator;
@@ -32,12 +36,20 @@ class PolymarketBot {
 
         if (this.hasPrivateKey) {
             console.log('✅ Private key detected - Full functionality enabled\n');
-            this.wallet = new Wallet(process.env.PRIVATE_KEY!);
+            let privateKey = process.env.PRIVATE_KEY!;
+            
+            // Remove quotes if present and ensure 0x prefix
+            privateKey = privateKey.replace(/^['"]|['"]$/g, '').trim();
+            if (!privateKey.startsWith('0x')) {
+                privateKey = '0x' + privateKey;
+            }
+            this.wallet = new Wallet(privateKey);
             this.credentials = new CredentialGenerator();
             this.allowanceManager = new AllowanceManager();
             this.bidAsker = new BidAsker();
             this.orderExecutor = new MarketOrderExecutor();
-            this.balanceChecker = new BalanceChecker();
+            const rpcUrl = process.env.RPC_URL?.replace(/^['"]|['"]$/g, '').trim() || 'https://polygon-rpc.com';
+            this.balanceChecker = new BalanceChecker(rpcUrl);
         } else {
             console.log('⚠️  No private key found - Running in READ-ONLY mode');
             console.log('   To enable trading, add your PRIVATE_KEY to the .env file\n');

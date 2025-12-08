@@ -3,7 +3,8 @@ import { formatEther, formatUnits } from '@ethersproject/units';
 import { Wallet } from '@ethersproject/wallet';
 
 const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
-const POLYGON_RPC = 'https://polygon-rpc.com';
+// Use a reliable public Polygon RPC endpoint
+const POLYGON_RPC = 'https://polygon.llamarpc.com';
 
 const ERC20_ABI = [
     {
@@ -22,11 +23,17 @@ export interface BalanceInfo {
 }
 
 export class BalanceChecker {
-    private provider: providers.JsonRpcProvider;
+    private provider: providers.StaticJsonRpcProvider;
     private usdcContract: Contract;
 
     constructor(rpcUrl: string = POLYGON_RPC) {
-        this.provider = new providers.JsonRpcProvider(rpcUrl);
+        // Use StaticJsonRpcProvider which doesn't try to detect network automatically
+        // Explicitly set Polygon network (chainId: 137) to avoid network detection issues
+        const network = {
+            chainId: 137,
+            name: 'polygon'
+        };
+        this.provider = new providers.StaticJsonRpcProvider(rpcUrl, network);
         this.usdcContract = new Contract(USDC_ADDRESS, ERC20_ABI, this.provider);
     }
 

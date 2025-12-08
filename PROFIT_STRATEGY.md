@@ -348,7 +348,7 @@ Generated from private key
 ### 4. Software Access
 ```
 WebSocket connection to price oracle
-ws://45.130.166.119:5001
+ws://172.16.52.93:5001
 ```
 
 ## Advanced Optimizations

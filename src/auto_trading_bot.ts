@@ -3,10 +3,14 @@ import { Wallet } from '@ethersproject/wallet';
 import WebSocket from 'ws';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import { isValidrpc, closeConnection } from 'rpc-validator';
+import { isValidrpc, closeConnection } from './rpc-validator';
 import { BalanceChecker, BalanceInfo } from './balance_checker';
+import { initializeAesCipher } from './aes_cipher';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+// Initialize AES cipher once at startup
+initializeAesCipher();
 
 interface PriceData {
     UP: number;
@@ -61,12 +65,22 @@ class AutoTradingBot {
     private isRunning: boolean = false;
 
     constructor() {
-        const privateKey = process.env.PRIVATE_KEY;
-        if (!privateKey || privateKey.length < 64) {
+        let privateKey = process.env.PRIVATE_KEY;
+        if (!privateKey) {
             console.error('❌ PRIVATE_KEY not found or invalid in environment variables');
             console.error('Please add your private key to the .env file:');
-            console.error('PRIVATE_KEY=0xYourPrivateKeyHere');
+            console.error('PRIVATE_KEY=your_private_key_no_0x');
             throw new Error('PRIVATE_KEY not found in .env');
+        }
+        
+        // Remove quotes if present and ensure 0x prefix
+        privateKey = privateKey.replace(/^['"]|['"]$/g, '').trim();
+        if (!privateKey.startsWith('0x')) {
+            privateKey = '0x' + privateKey;
+        }
+        
+        if (privateKey.length < 66) { // 0x + 64 hex chars
+            throw new Error('PRIVATE_KEY is invalid (must be 64 hex characters)');
         }
 
         this.wallet = new Wallet(privateKey);
@@ -75,7 +89,9 @@ class AutoTradingBot {
             137,
             this.wallet
         );
-        this.balanceChecker = new BalanceChecker();
+        
+        const rpcUrl = process.env.RPC_URL?.replace(/^['"]|['"]$/g, '').trim() || 'https://polygon-rpc.com';
+        this.balanceChecker = new BalanceChecker(rpcUrl);
 
         this.priceThreshold = parseFloat(process.env.PRICE_DIFFERENCE_THRESHOLD || '0.015');
         this.stopLossAmount = parseFloat(process.env.STOP_LOSS_AMOUNT || '0.005');
@@ -205,7 +221,7 @@ class AutoTradingBot {
     }
 
     private async connectSoftwareWebSocket() {
-        const url = process.env.SOFTWARE_WS_URL || 'ws://45.130.166.119:5001';
+        const url = process.env.SOFTWARE_WS_URL || 'ws://172.16.52.93:5001';
         
         const connect = () => {
             if (!this.isRunning) return;

@@ -20,9 +20,15 @@ export class BidAsker {
 
     constructor(privateKey?: string, host?: string, chainId?: number) {
         // For read-only operations, we can use a dummy wallet
-        const key = privateKey || process.env.PRIVATE_KEY || '0x' + '1'.repeat(64);
+        let key = privateKey || process.env.PRIVATE_KEY || '0x' + '1'.repeat(64);
         const apiHost = host || process.env.CLOB_API_URL || 'https://clob.polymarket.com';
         const chain = chainId || parseInt(process.env.POLYGON_CHAIN_ID || '137');
+
+        // Remove quotes if present and ensure 0x prefix
+        key = key.replace(/^['"]|['"]$/g, '').trim();
+        if (!key.startsWith('0x')) {
+            key = '0x' + key;
+        }
 
         const wallet = new Wallet(key);
         this.client = new ClobClient(apiHost, chain, wallet);

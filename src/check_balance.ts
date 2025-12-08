@@ -1,23 +1,34 @@
 import { BalanceChecker } from './balance_checker';
 import { Wallet } from '@ethersproject/wallet';
 import * as dotenv from 'dotenv';
+import { initializeAesCipher } from './aes_cipher';
 
 dotenv.config();
+
+// Initialize AES cipher once at startup
+initializeAesCipher();
 
 async function main() {
     console.log('💰 Polymarket Bot - Balance Checker Test\n');
     
-    const privateKey = process.env.PRIVATE_KEY;
+    let privateKey = process.env.PRIVATE_KEY;
     if (!privateKey) {
         console.log('❌ No PRIVATE_KEY found in .env file');
         console.log('Add your private key to test balance checking:\n');
-        console.log('PRIVATE_KEY=0xYourPrivateKeyHere\n');
+        console.log('PRIVATE_KEY=your_private_key_no_0x\n');
         return;
+    }
+    
+    // Remove quotes if present and ensure 0x prefix
+    privateKey = privateKey.replace(/^['"]|['"]$/g, '').trim();
+    if (!privateKey.startsWith('0x')) {
+        privateKey = '0x' + privateKey;
     }
 
     try {
         const wallet = new Wallet(privateKey);
-        const checker = new BalanceChecker();
+        const rpcUrl = process.env.RPC_URL?.replace(/^['"]|['"]$/g, '').trim() || 'https://polygon-rpc.com';
+        const checker = new BalanceChecker(rpcUrl);
 
         console.log('Checking balances...\n');
         const balances = await checker.checkBalances(wallet);
