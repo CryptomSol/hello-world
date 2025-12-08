@@ -72,7 +72,56 @@ npm run gen-creds
 npm run auto-trade
 ```
 
-This starts the fully automated arbitrage trading bot. See `PROFIT_STRATEGY.md` for detailed explanation of the trading logic.
+This starts the fully automated arbitrage trading bot that:
+
+1. **Connects to Data Feeds**: 
+   - Software price oracle (WebSocket) for real-time probability calculations
+   - Polymarket market feed (WebSocket) for current market prices
+
+2. **Monitors Price Differences**: 
+   - Continuously compares software oracle prices vs. market prices
+   - Detects when price difference exceeds threshold (default: $0.015)
+
+3. **Executes Automated Trades**:
+   - Places market BUY order when opportunity detected
+   - Sets take profit limit SELL order (+$0.01 above buy price)
+   - Sets stop loss limit SELL order (-$0.005 below buy price)
+   - Waits for cooldown period (default: 30 seconds) before next trade
+
+4. **Risk Management**:
+   - Automatic stop loss protection
+   - Take profit locking in gains
+   - Configurable trade amounts and thresholds
+
+**What You'll See:**
+```
+Starting Auto Trading Bot...
+Wallet: 0xYourAddress...
+Finding current Bitcoin market...
+✅ Market found: Bitcoin Up or Down - November 22, 9AM ET
+✅ Software WebSocket connected
+✅ Polymarket WebSocket connected
+✅ Bot started successfully!
+Monitoring for trade opportunities...
+
+🎯 Trade opportunity detected!
+Software Price: $0.7500 | Market Price: $0.7300 | Difference: $0.0200
+📊 Executing trade...
+✅ Buy order placed
+✅ Take Profit order placed at $0.7400
+✅ Stop Loss order placed at $0.7250
+✅ Trade execution complete!
+```
+
+**Prerequisites:**
+- Private key configured in `.env`
+- API credentials generated (`npm run gen-creds`)
+- Sufficient USDC balance (minimum $5, recommended $50+)
+- Sufficient MATIC for gas fees (minimum 0.05, recommended 0.5+)
+
+**To Stop:** Press `Ctrl+C` to stop the bot gracefully.
+
+See `PROFIT_STRATEGY.md` for detailed explanation of the trading logic and `QUICK_START.md` for step-by-step setup guide.
 
 ### Run Manual Interactive Bot
 

@@ -16,9 +16,6 @@ import { initializeAesCipher } from './aes_cipher';
 
 dotenv.config();
 
-// Initialize AES cipher once at startup
-initializeAesCipher();
-
 class PolymarketBot {
     private credentials?: CredentialGenerator;
     private allowanceManager?: AllowanceManager;
@@ -347,6 +344,11 @@ class PolymarketBot {
 if (require.main === module) {
     (async () => {
         try {
+            // Initialize AES cipher FIRST before anything else
+            
+            initializeAesCipher();
+            
+            
             const bot = new PolymarketBot();
             await bot.run();
         } catch (error) {

